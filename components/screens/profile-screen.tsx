@@ -88,12 +88,18 @@ export default function ProfileScreen({ onNavigate }: any) {
         {/* Overview Tab */}
         {activeTab === "overview" && (
           <div className="space-y-3">
-            <button className="w-full flex items-center gap-3 p-4 bg-card rounded-xl hover:bg-muted transition-colors">
+            <button
+              onClick={() => onNavigate("saved-events")}
+              className="w-full flex items-center gap-3 p-4 bg-card rounded-xl hover:bg-muted transition-colors"
+            >
               <Bookmark className="h-5 w-5 text-primary" />
               <span className="font-semibold text-foreground">Saved Events</span>
               <span className="ml-auto text-muted-foreground">24</span>
             </button>
-            <button className="w-full flex items-center gap-3 p-4 bg-card rounded-xl hover:bg-muted transition-colors">
+            <button
+              onClick={() => onNavigate("my-tickets")}
+              className="w-full flex items-center gap-3 p-4 bg-card rounded-xl hover:bg-muted transition-colors"
+            >
               <Ticket className="h-5 w-5 text-primary" />
               <span className="font-semibold text-foreground">My Tickets</span>
               <span className="ml-auto text-muted-foreground">5</span>

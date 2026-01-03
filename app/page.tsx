@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import OnboardingScreen from "@/components/screens/onboarding-screen"
 import SignupScreen from "@/components/screens/signup-screen"
 import LoginScreen from "@/components/screens/login-screen"
@@ -13,52 +13,78 @@ import CommunityScreen from "@/components/screens/community-screen"
 import ProfileScreen from "@/components/screens/profile-screen"
 import SettingsScreen from "@/components/screens/settings-screen"
 import OrganizerPortal from "@/components/screens/organizer-portal"
+import SearchResultsScreen from "@/components/screens/search-results-screen"
+import SavedEventsScreen from "@/components/screens/saved-events-screen"
+import MyTicketsScreen from "@/components/screens/my-tickets-screen"
+import NotificationsScreen from "@/components/screens/notifications-screen"
+import EditEventScreen from "@/components/screens/edit-event-screen"
 
-export default function Home() {
-  const [currentScreen, setCurrentScreen] = useState("onboarding")
-  const [selectedEvent, setSelectedEvent] = useState(null)
-  const [userRole, setUserRole] = useState<"customer" | "organizer" | null>(null)
-
-  const handleNavigate = (screen: string, event?: any) => {
-    setCurrentScreen(screen)
-    if (event) setSelectedEvent(event)
-  }
-
-  const handleRoleSelect = (role: "customer" | "organizer") => {
-    setUserRole(role)
-    handleNavigate(role === "organizer" ? "organizer" : "preferences")
-  }
-
+function PageContent({ currentScreen, selectedEvent, userRole, searchQuery, onNavigate, setUserRole }: any) {
   return (
     <div className="min-h-screen bg-background">
-      {currentScreen === "onboarding" && <OnboardingScreen onNavigate={handleNavigate} />}
-      {currentScreen === "signup" && <SignupScreen onNavigate={() => handleNavigate("role-selection")} />}
-      {currentScreen === "login" && <LoginScreen onNavigate={() => handleNavigate("role-selection")} />}
+      {currentScreen === "onboarding" && <OnboardingScreen onNavigate={onNavigate} />}
+      {currentScreen === "signup" && <SignupScreen onNavigate={() => onNavigate("role-selection")} />}
+      {currentScreen === "login" && <LoginScreen onNavigate={() => onNavigate("role-selection")} />}
       {currentScreen === "role-selection" && (
         <RoleSelectionScreen
           onNavigate={(screen: string) => {
             if (screen === "organizer") {
               setUserRole("organizer")
-              handleNavigate("organizer")
+              onNavigate("organizer")
             } else {
               setUserRole("customer")
-              handleNavigate("preferences")
+              onNavigate("preferences")
             }
           }}
         />
       )}
       {currentScreen === "preferences" && userRole === "customer" && (
-        <PreferenceDiscoveryScreen onNavigate={handleNavigate} />
+        <PreferenceDiscoveryScreen onNavigate={onNavigate} />
       )}
-      {currentScreen === "home" && userRole === "customer" && <HomeScreen onNavigate={handleNavigate} />}
+      {currentScreen === "home" && userRole === "customer" && <HomeScreen onNavigate={onNavigate} />}
       {currentScreen === "event-detail" && selectedEvent && userRole === "customer" && (
-        <EventDetailScreen event={selectedEvent} onNavigate={handleNavigate} />
+        <EventDetailScreen event={selectedEvent} onNavigate={onNavigate} />
       )}
-      {currentScreen === "ai-planner" && userRole === "customer" && <AIPlanner onNavigate={handleNavigate} />}
-      {currentScreen === "community" && userRole === "customer" && <CommunityScreen onNavigate={handleNavigate} />}
-      {currentScreen === "profile" && userRole === "customer" && <ProfileScreen onNavigate={handleNavigate} />}
-      {currentScreen === "settings" && <SettingsScreen onNavigate={handleNavigate} />}
-      {currentScreen === "organizer" && userRole === "organizer" && <OrganizerPortal onNavigate={handleNavigate} />}
+      {currentScreen === "ai-planner" && userRole === "customer" && <AIPlanner onNavigate={onNavigate} />}
+      {currentScreen === "community" && userRole === "customer" && <CommunityScreen onNavigate={onNavigate} />}
+      {currentScreen === "profile" && userRole === "customer" && <ProfileScreen onNavigate={onNavigate} />}
+      {currentScreen === "settings" && <SettingsScreen onNavigate={onNavigate} />}
+      {currentScreen === "saved-events" && userRole === "customer" && <SavedEventsScreen onNavigate={onNavigate} />}
+      {currentScreen === "my-tickets" && userRole === "customer" && <MyTicketsScreen onNavigate={onNavigate} />}
+      {currentScreen === "notifications" && <NotificationsScreen onNavigate={onNavigate} />}
+      {currentScreen === "search-results" && userRole === "customer" && (
+        <SearchResultsScreen searchQuery={searchQuery} onNavigate={onNavigate} />
+      )}
+      {currentScreen === "edit-event" && userRole === "organizer" && selectedEvent && (
+        <EditEventScreen event={selectedEvent} onNavigate={onNavigate} />
+      )}
+      {currentScreen === "organizer" && userRole === "organizer" && <OrganizerPortal onNavigate={onNavigate} />}
     </div>
+  )
+}
+
+export default function Home() {
+  const [currentScreen, setCurrentScreen] = useState("onboarding")
+  const [selectedEvent, setSelectedEvent] = useState(null)
+  const [userRole, setUserRole] = useState<"customer" | "organizer" | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const handleNavigate = (screen: string, event?: any, query?: string) => {
+    setCurrentScreen(screen)
+    if (event) setSelectedEvent(event)
+    if (query) setSearchQuery(query)
+  }
+
+  return (
+    <Suspense fallback={null}>
+      <PageContent
+        currentScreen={currentScreen}
+        selectedEvent={selectedEvent}
+        userRole={userRole}
+        searchQuery={searchQuery}
+        onNavigate={handleNavigate}
+        setUserRole={setUserRole}
+      />
+    </Suspense>
   )
 }

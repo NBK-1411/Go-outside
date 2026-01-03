@@ -126,7 +126,17 @@ export default function HomeScreen({ onNavigate }: any) {
             type="text"
             placeholder="What do you want to do this weekend?"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              if (e.target.value.trim()) {
+                onNavigate("search-results", undefined, e.target.value)
+              }
+            }}
+            onKeyPress={(e) => {
+              if (e.key === "Enter" && searchQuery.trim()) {
+                onNavigate("search-results", undefined, searchQuery)
+              }
+            }}
             className="w-full bg-white/20 text-white placeholder-white/60 rounded-full pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
           />
         </div>
