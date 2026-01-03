@@ -4,6 +4,8 @@ import { useState } from "react"
 import OnboardingScreen from "@/components/screens/onboarding-screen"
 import SignupScreen from "@/components/screens/signup-screen"
 import LoginScreen from "@/components/screens/login-screen"
+import RoleSelectionScreen from "@/components/screens/role-selection-screen"
+import PreferenceDiscoveryScreen from "@/components/screens/preference-discovery-screen"
 import HomeScreen from "@/components/screens/home-screen"
 import EventDetailScreen from "@/components/screens/event-detail-screen"
 import AIPlanner from "@/components/screens/ai-planner-screen"
@@ -15,37 +17,48 @@ import OrganizerPortal from "@/components/screens/organizer-portal"
 export default function Home() {
   const [currentScreen, setCurrentScreen] = useState("onboarding")
   const [selectedEvent, setSelectedEvent] = useState(null)
-
-  console.log("[v0] Home page rendered, currentScreen:", currentScreen)
+  const [userRole, setUserRole] = useState<"customer" | "organizer" | null>(null)
 
   const handleNavigate = (screen: string, event?: any) => {
-    console.log("[v0] Navigating to:", screen)
     setCurrentScreen(screen)
     if (event) setSelectedEvent(event)
+  }
+
+  const handleRoleSelect = (role: "customer" | "organizer") => {
+    setUserRole(role)
+    handleNavigate(role === "organizer" ? "organizer" : "preferences")
   }
 
   return (
     <div className="min-h-screen bg-background">
       {currentScreen === "onboarding" && <OnboardingScreen onNavigate={handleNavigate} />}
-      {!currentScreen && (
-        <div className="min-h-screen flex items-center justify-center bg-primary text-white">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">GoOutside</h1>
-            <p className="text-xl">Loading...</p>
-          </div>
-        </div>
+      {currentScreen === "signup" && <SignupScreen onNavigate={() => handleNavigate("role-selection")} />}
+      {currentScreen === "login" && <LoginScreen onNavigate={() => handleNavigate("role-selection")} />}
+      {currentScreen === "role-selection" && (
+        <RoleSelectionScreen
+          onNavigate={(screen: string) => {
+            if (screen === "organizer") {
+              setUserRole("organizer")
+              handleNavigate("organizer")
+            } else {
+              setUserRole("customer")
+              handleNavigate("preferences")
+            }
+          }}
+        />
       )}
-      {currentScreen === "signup" && <SignupScreen onNavigate={handleNavigate} />}
-      {currentScreen === "login" && <LoginScreen onNavigate={handleNavigate} />}
-      {currentScreen === "home" && <HomeScreen onNavigate={handleNavigate} />}
-      {currentScreen === "event-detail" && selectedEvent && (
+      {currentScreen === "preferences" && userRole === "customer" && (
+        <PreferenceDiscoveryScreen onNavigate={handleNavigate} />
+      )}
+      {currentScreen === "home" && userRole === "customer" && <HomeScreen onNavigate={handleNavigate} />}
+      {currentScreen === "event-detail" && selectedEvent && userRole === "customer" && (
         <EventDetailScreen event={selectedEvent} onNavigate={handleNavigate} />
       )}
-      {currentScreen === "ai-planner" && <AIPlanner onNavigate={handleNavigate} />}
-      {currentScreen === "community" && <CommunityScreen onNavigate={handleNavigate} />}
-      {currentScreen === "profile" && <ProfileScreen onNavigate={handleNavigate} />}
+      {currentScreen === "ai-planner" && userRole === "customer" && <AIPlanner onNavigate={handleNavigate} />}
+      {currentScreen === "community" && userRole === "customer" && <CommunityScreen onNavigate={handleNavigate} />}
+      {currentScreen === "profile" && userRole === "customer" && <ProfileScreen onNavigate={handleNavigate} />}
       {currentScreen === "settings" && <SettingsScreen onNavigate={handleNavigate} />}
-      {currentScreen === "organizer" && <OrganizerPortal onNavigate={handleNavigate} />}
+      {currentScreen === "organizer" && userRole === "organizer" && <OrganizerPortal onNavigate={handleNavigate} />}
     </div>
   )
 }

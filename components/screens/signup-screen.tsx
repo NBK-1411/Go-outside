@@ -52,10 +52,9 @@ export default function SignupScreen({ onNavigate }: any) {
     if (!validateForm()) return
 
     setIsLoading(true)
-    // Simulate API call
     setTimeout(() => {
       setIsLoading(false)
-      onNavigate("home")
+      onNavigate("preferences")
     }, 1500)
   }
 
@@ -83,8 +82,8 @@ export default function SignupScreen({ onNavigate }: any) {
             <ChevronLeft className="h-6 w-6 text-foreground" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Create Account</h1>
-            <p className="text-sm text-muted-foreground">Join GoOutside today</p>
+            <h1 className="text-2xl font-bold text-foreground">Join Us</h1>
+            <p className="text-sm text-muted-foreground">Create your GoOutside account - no be long thing!</p>
           </div>
         </div>
 
@@ -101,7 +100,7 @@ export default function SignupScreen({ onNavigate }: any) {
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
-                  placeholder="John Doe"
+                  placeholder="Your name"
                   className={`w-full pl-10 pr-4 py-3 rounded-lg border-2 transition-colors focus:outline-none ${
                     errors.fullName
                       ? "border-destructive focus:border-destructive"
